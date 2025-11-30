@@ -49,8 +49,9 @@ export const generateHairstyle = async (
       2. A brief text explanation in **CHINESE (Simplified)** explaining why this specific style and color suits their face shape (e.g., "这款微分碎盖很适合你的鹅蛋脸...").
     `;
 
+    // Switch to gemini-2.0-flash-exp which is generally available on free tier and supports image editing
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash-image',
+      model: 'gemini-2.0-flash-exp',
       contents: {
         parts: [
           {

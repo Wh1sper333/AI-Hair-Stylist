@@ -58,12 +58,15 @@ const App: React.FC = () => {
     } catch (error: any) {
       console.error(error);
       const errorMessage = error instanceof Error ? error.message : "未知错误 (Unknown error)";
+      const errorString = String(error);
       
       // Improve user experience for common errors
       if (errorMessage.includes("API key not valid")) {
          alert("API Key 无效，请检查 Vercel 设置。\n(Invalid API Key)");
       } else if (errorMessage.includes("SAFETY")) {
          alert("图片因安全策略被拦截，请尝试更换照片。\n(Image blocked by safety filters)");
+      } else if (errorMessage.includes("429") || errorMessage.includes("RESOURCE_EXHAUSTED") || errorMessage.includes("Quota")) {
+         alert("API 配额已耗尽。Gemini 免费版每分钟有请求限制，请稍后再试。\n(API Quota Exceeded. Please try again later.)");
       } else {
          alert(`生成失败 (Failed): ${errorMessage}`);
       }
