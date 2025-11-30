@@ -1,0 +1,7 @@
+{
+  "name": "AI Hair Stylist",
+  "description": "Upload your photo and let AI design the perfect hairstyle for your face shape.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
