@@ -6,12 +6,16 @@ import { HAIR_STYLES } from "../data/hairStyles";
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 // List of models to try in sequence.
-// We prioritize Flash (fastest), then fallback to Pro (powerful) if Flash is rate-limited.
+// We prioritize Flash (fastest), then fallback to Pro (powerful), then to 2.5 (legacy/stable).
 // These models have separate quota buckets on the free tier.
 const MODELS_TO_TRY = [
   'gemini-2.0-flash-exp',
-  'gemini-2.0-pro-exp-02-05'
+  'gemini-2.0-pro-exp-02-05',
+  'gemini-2.5-flash-image' // Added as a 3rd fallback option
 ];
+
+// Helper to pause execution
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 /**
  * Generates a hairstyle based on the input image and selected options.
@@ -59,9 +63,10 @@ export const generateHairstyle = async (
   let lastError: any = null;
 
   // Loop through models to try them one by one
-  for (const modelName of MODELS_TO_TRY) {
+  for (let i = 0; i < MODELS_TO_TRY.length; i++) {
+    const modelName = MODELS_TO_TRY[i];
     try {
-      console.log(`Attempting generation with model: ${modelName}`);
+      console.log(`Attempting generation with model: ${modelName} (Attempt ${i + 1}/${MODELS_TO_TRY.length})`);
 
       const response = await ai.models.generateContent({
         model: modelName,
@@ -117,7 +122,6 @@ export const generateHairstyle = async (
       const errorMessage = error.toString();
       
       // Check if the error is related to Quota (429) or Server Overload (503).
-      // If it is, we continue the loop to try the next model.
       const isQuotaError = errorMessage.includes('429') || 
                            errorMessage.includes('RESOURCE_EXHAUSTED') || 
                            errorMessage.includes('Quota') ||
@@ -127,7 +131,13 @@ export const generateHairstyle = async (
         // If it's a safety block or invalid input, retrying won't help, so we throw.
         throw error;
       }
-      // Otherwise, loop continues to the next model in MODELS_TO_TRY
+
+      // If it is a quota error, and we have more models to try:
+      if (i < MODELS_TO_TRY.length - 1) {
+        console.log("Quota exceeded, waiting 2s before trying next model...");
+        // Critical: Wait 2 seconds to let the rate limit bucket potentially reset
+        await delay(2000);
+      }
     }
   }
 
