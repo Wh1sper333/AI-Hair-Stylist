@@ -1,4 +1,4 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, HarmCategory, HarmBlockThreshold } from "@google/genai";
 import { StylistOptions, GenerationResult, Gender } from "../types";
 import { HAIR_STYLES } from "../data/hairStyles";
 
@@ -64,9 +64,15 @@ export const generateHairstyle = async (
           },
         ],
       },
-      // Corrected config structure (no generationConfig wrapper)
+      // Corrected config structure with safety settings to prevent blocking
       config: {
-        temperature: 0.4, 
+        temperature: 0.4,
+        safetySettings: [
+          { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
+          { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+          { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
+          { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+        ]
       }
     });
 

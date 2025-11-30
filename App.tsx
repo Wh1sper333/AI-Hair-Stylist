@@ -41,6 +41,12 @@ const App: React.FC = () => {
   const handleGenerate = async () => {
     if (!selectedImage) return;
 
+    // Check if API key is present (simple check)
+    if (!process.env.API_KEY) {
+      alert("配置错误：未找到 API Key。请在 Vercel 环境变量中设置 API_KEY。\n(Configuration Error: API_KEY not found)");
+      return;
+    }
+
     setIsGenerating(true);
     setResultImage(null);
     setTextAnalysis(null);
@@ -49,9 +55,18 @@ const App: React.FC = () => {
       const result = await generateHairstyle(selectedImage, options);
       setResultImage(result.imageUrl);
       setTextAnalysis(result.textAnalysis);
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      alert("生成失败，请重试 (Failed to generate)");
+      const errorMessage = error instanceof Error ? error.message : "未知错误 (Unknown error)";
+      
+      // Improve user experience for common errors
+      if (errorMessage.includes("API key not valid")) {
+         alert("API Key 无效，请检查 Vercel 设置。\n(Invalid API Key)");
+      } else if (errorMessage.includes("SAFETY")) {
+         alert("图片因安全策略被拦截，请尝试更换照片。\n(Image blocked by safety filters)");
+      } else {
+         alert(`生成失败 (Failed): ${errorMessage}`);
+      }
     } finally {
       setIsGenerating(false);
     }
