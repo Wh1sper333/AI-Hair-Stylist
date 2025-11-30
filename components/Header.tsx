@@ -13,7 +13,7 @@ export const Header: React.FC = () => {
             AI 托尼老师 (AI Hair Stylist)
           </h1>
           <p className="text-xs text-zinc-500 font-medium tracking-wide">
-            POWERED BY GEMINI 2.0 FLASH EXP
+            POWERED BY GEMINI 2.0 (AUTO-SWITCH)
           </p>
         </div>
       </div>
