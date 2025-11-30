@@ -1,8 +1,8 @@
-
 import { GoogleGenAI } from "@google/genai";
 import { StylistOptions, GenerationResult, Gender } from "../types";
 import { HAIR_STYLES } from "../data/hairStyles";
 
+// Initialize AI. process.env.API_KEY will be injected by Vite during build.
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 /**
@@ -64,10 +64,9 @@ export const generateHairstyle = async (
           },
         ],
       },
+      // Corrected config structure (no generationConfig wrapper)
       config: {
-        generationConfig: {
-          temperature: 0.4, 
-        }
+        temperature: 0.4, 
       }
     });
 
